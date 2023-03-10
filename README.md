@@ -11,5 +11,5 @@
 
 -> cd to  your local `Plan2Go` folder
 
--> `commit` & `push` your whole local folder to this remote repo `Plan2Go`
+-> `commit` & `push` your whole local folder to this remote repo `Plan2Go` (to a specific `branch`)
 
