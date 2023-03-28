@@ -1,4 +1,16 @@
-We are trying to use multiple repositories (client and microservices).
+# Plan2Go
+This is the main docker-compose file for the Plan2Go.
 
-This repository will contain the docker-compose files and some Docker configurations, but not the specific code for client and servers .
-
+## run
+```bash
+docker-compose up
+```
+or 
+```bash
+# to run the code in detached mode
+docker-compose up -d
+```
+## stop
+```bash
+docker-compose down
+```
