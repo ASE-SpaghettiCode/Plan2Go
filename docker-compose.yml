@@ -8,7 +8,7 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=password
     networks:
-      - spaghetticode
+      - plan2go
 
   mongo-express:
     image: mongo-express
@@ -19,14 +19,18 @@ services:
       - ME_CONFIG_MONGODB_ADMINPASSWORD=password
       - ME_CONFIG_MONGODB_SERVER=mongodb
     networks:
-      - spaghetticode
+      - plan2go
 
   UserServer:
     image: plan2go/user_server:latest
     ports:
       - "8081:8081"
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://admin:password@mongodb:27017/admin?authMechanism=SCRAM-SHA-256
     depends_on:
       - mongodb
+    networks:
+      - plan2go
 
   TravelNoteServer:
     image: plan2go/travel_note_server:latest
@@ -34,8 +38,21 @@ services:
       - "8082:8082"
     depends_on:
         - mongodb
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://admin:password@mongodb:27017/admin?authMechanism=SCRAM-SHA-256
     networks:
-      - spaghetticode
+      - plan2go
+
+  PostServer:
+    image: plan2go/post_server:latest
+    ports:
+      - "8083:8083"
+    depends_on:
+      - mongodb
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://admin:password@mongodb:27017/admin?authMechanism=SCRAM-SHA-256
+    networks:
+      - plan2go
 
   Client:
     image: plan2go/client:latest
@@ -46,10 +63,22 @@ services:
       - UserServer
       - TravelNoteServer
     networks:
-      - spaghetticode
+      - plan2go
+
+  localstack:
+    image: localstack/localstack
+    ports:
+      - "4566:4566"
+      - "4571-4599:4571-4599"
+    environment:
+      SERVICES: s3
+#    volumes:
+#      - localstack-data:/tmp/localstack
+    networks:
+      - plan2go
 
 networks:
-  spaghetticode:
+  plan2go:
     driver: bridge
 
 
