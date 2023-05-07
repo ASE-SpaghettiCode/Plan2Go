@@ -27,6 +27,8 @@ services:
       - "8081:8081"
     environment:
       - SPRING_DATA_MONGODB_URI=mongodb://admin:password@mongodb:27017/admin?authMechanism=SCRAM-SHA-256
+      - TravelNoteServerLocation=http://TravelNoteServer:8082
+      - PostServerLocation=http://PostServer:8083
     depends_on:
       - mongodb
     networks:
@@ -40,6 +42,8 @@ services:
         - mongodb
     environment:
       - SPRING_DATA_MONGODB_URI=mongodb://admin:password@mongodb:27017/admin?authMechanism=SCRAM-SHA-256
+      - UserServerLocation=http://UserServer:8081
+      - PostServerLocation=http://PostServer:8083
     networks:
       - plan2go
 
@@ -51,6 +55,8 @@ services:
       - mongodb
     environment:
       - SPRING_DATA_MONGODB_URI=mongodb://admin:password@mongodb:27017/admin?authMechanism=SCRAM-SHA-256
+      - UserServerLocation=http://UserServer:8081
+      - TravelNoteServerLocation=http://TravelNoteServer:8082
     networks:
       - plan2go
 
@@ -62,20 +68,22 @@ services:
       - mongodb
       - UserServer
       - TravelNoteServer
+      - PostServer
     networks:
       - plan2go
-
-  localstack:
-    image: localstack/localstack
-    ports:
-      - "4566:4566"
-      - "4571-4599:4571-4599"
-    environment:
-      SERVICES: s3
-#    volumes:
-#      - localstack-data:/tmp/localstack
-    networks:
-      - plan2go
+#
+#  localstack:
+#    image: localstack/localstack
+#    ports:
+#      - 4566:4566
+#    environment:
+#      - SERVICES:s3
+#      - AWS_ACCESS_KEY_ID=foo
+#      - AWS_SECRET_ACCESS_KEY=bar
+#      - AWS_DEFAULT_REGION=eu-central-2
+#    networks:
+#      - plan2go
+#
 
 networks:
   plan2go:
