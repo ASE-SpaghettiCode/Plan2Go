@@ -1,0 +1,174 @@
+{
+    "family": "plan2go-app",
+    "networkMode": "bridge",
+    "containerDefinitions": [
+    {
+        "name": "mongodb",
+        "image": "mongo",
+        "portMappings": [
+            {
+            "containerPort": 27017,
+            "hostPort": 27017
+            }
+        ],
+        "environment": [
+            {
+            "name": "MONGO_INITDB_ROOT_USERNAME",
+            "value": "admin"
+            },
+            {
+            "name": "MONGO_INITDB_ROOT_PASSWORD",
+            "value": "password"
+            }
+        ]
+    },
+    {
+        "name": "mongo-express",
+        "image": "mongo-express",
+        "portMappings": [
+            {
+            "containerPort": 8081,
+            "hostPort": 8084
+            }
+        ],
+        "environment": [
+            {
+            "name": "ME_CONFIG_MONGODB_ADMINUSERNAME",
+            "value": "admin"
+            },
+            {
+            "name": "ME_CONFIG_MONGODB_ADMINPASSWORD",
+            "value": "password"
+            },
+            {
+            "name": "ME_CONFIG_MONGODB_SERVER",
+            "value": "mongodb"
+            }
+        ],
+        "dependsOn": [
+            {
+            "containerName": "mongodb",
+            "condition": "START"
+            }
+        ]
+    },
+    {
+        "name": "UserServer",
+        "image": "plan2go/user_server:latest",
+        "portMappings": [
+            {
+            "containerPort": 8081,
+            "hostPort": 8081
+            }
+        ],
+        "environment": [
+            {
+            "name": "SPRING_DATA_MONGODB_URI",
+            "value": "mongodb://admin:password@mongodb:27017/admin?authMechanism=SCRAM-SHA-256"
+            },
+            {
+            "name": "TravelNoteServerLocation",
+            "value": "http://TravelNoteServer:8082"
+            },
+            {
+            "name": "PostServerLocation",
+            "value": "http://PostServer:8083"
+            }
+        ],
+        "dependsOn": [
+            {
+            "containerName": "mongodb",
+            "condition": "START"
+            }
+        ]
+    },
+    {
+        "name": "TravelNoteServer",
+        "image": "plan2go/travel_note_server:latest",
+        "portMappings": [
+            {
+            "containerPort": 8082,
+            "hostPort": 8082
+            }
+        ],
+        "environment": [
+            {
+            "name": "SPRING_DATA_MONGODB_URI",
+            "value": "mongodb://admin:password@mongodb:27017/admin?authMechanism=SCRAM-SHA-256"
+            },
+            {
+            "name": "UserServerLocation",
+            "value": "http://UserServer:8081"
+            },
+            {
+            "name": "PostServerLocation",
+            "value": "http://PostServer:8083"
+            }
+        ],
+        "dependsOn": [
+            {
+            "containerName": "mongodb",
+            "condition": "START"
+            }
+        ]
+    },
+    {
+        "name": "PostServer",
+        "image": "plan2go/post_server:latest",
+        "portMappings": [
+            {
+            "containerPort": 8083,
+            "hostPort": 8083
+            }
+        ],
+        "environment": [
+            {
+            "name": "SPRING_DATA_MONGODB_URI",
+            "value": "mongodb://admin:password@mongodb:27017/admin?authMechanism=SCRAM-SHA--256"
+            },
+            {
+                "name": "UserServerLocation",
+                "value": "http://UserServer:8081"
+            },
+            {
+                "name": "TravelNoteServerLocation",
+                "value": "http://TravelNoteServer:8082"
+            }
+        ],
+        "dependsOn": [
+            {
+            "containerName": "mongodb",
+            "condition": "START"
+            }
+        ]
+    },
+    {
+        "name": "client",
+        "image": "plan2go/client:latest",
+        "portMappings": [
+            {
+            "containerPort": 3000,
+            "hostPort": 3000
+            }
+        ],
+        "dependsOn": [
+            {
+            "containerName": "mongodb",
+            "condition": "START"
+            },
+            {
+            "containerName": "UserServer",
+            "condition": "START"
+            },
+            {
+            "containerName": "TravelNoteServer",
+            "condition": "START"
+            },
+            {
+            "containerName": "PostServer",
+            "condition": "START"
+            }
+        ]
+    }
+]
+}
