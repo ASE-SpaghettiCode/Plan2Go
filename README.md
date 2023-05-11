@@ -37,16 +37,16 @@ docker-compose pull
 
 NOTICE: using AWS ECS local testing provided by LocalStack requires their "pro" edition.
 
-### 1. install the offical aws cli provided by aws:
+### 1. Install the offical aws cli provided by aws:
 ```bash
 pip install aws
 ```
-### 2. install the wrapped cli awslocal provided by localstack
+### 2. Install the wrapped cli awslocal provided by localstack
 ```bash
 pip install awscli-local
 ```
-### 3. start localstack:            
-- Option1: install localstack cli and run localstack in command line       
+### 3. Start localstack:            
+#### *Option1*: use localstack cli
 
 ```bash
 # for MacOS with brew:
@@ -56,32 +56,79 @@ brew install localstack
 # with pip:
 pip install localstack
 ```
-then in the command line:
+
 ```bash
-localstack start
+# set environment variable to use the pro version
+export LOCALSTACK_API_KEY={api_key}
 ```
 
-- Option2: run localstack in a docker container
+```bash
+# start localstack
+localstack start 
+```
+
+#### *Option2*: run localstack in a docker container
 ```bash
 docker run \
   --rm -it \
   -p 4566:4566 \
   -p 4510-4559:4510-4559 \
-  localstack/localstack       
+  localstack/localstack-pro       
 ```
 see the [localstack documents](https://docs.localstack.cloud/getting-started/installation/#docker) for more details. 
 
 
 ### 4. Register the task definition with ECS 
-In this folder, there is a well-defined taskdef.json. Register this file with ECS by running the following command:
+In this folder, there is a well-defined taskdef.json. Register this file with ECS and check all tasks by running the following command:
 
 ```bash
+# Register
 awslocal ecs register-task-definition --cli-input-json file://taskdef.json
 ```
+AWS will return a json-formatted taskDefinishtion back, in which there is a "taskDefinitionArn".
 
-### 5. push the Docker images to AWS Local ECS by running the following commands:
+This ARN number is formatted like:
+```bash
+arn:aws:ecs:<region>:<account-id>:task-definition/<family>:<revision>
+```
+for example: 
+```bash
+# copy this ARN numeber
+arn:aws:ecs:us-east-1:000000000000:task-definition/plan2go-app:2
+```
+### 5. Create a new ECS cluster
+```bash
+# create a new cluster:
+awslocal ecs create-cluster --cluster-name new-cluster-name
+
+# check all clusters:
+awslocal ecs list-clusters
+```
+
+### 5. Run the task
+Once we have the task and cluster defined, we can run this task on this cluster by:
+```bash
+# Run
+awslocal ecs run-task --cluster {cluster-name} --task-definition {ID_or_ARN_number_of_the_task}
+
+# Check the task is running
+awslocal ecs list-tasks
+```
+
+
+### 5. Push the Docker images to AWS Local ECS by running the following commands:
 ```bash
 docker-compose push
+```
+
+
+### 6. Install the Session Manager plugin, you can follow the instructions in the AWS documentation:
+
+Download the appropriate Session Manager plugin package for your operating system from the [AWS Systems Manager Session Manager Plugin page](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html#install-plugin-macos).
+
+Check if the session-manager-plugin is successfully installed by running:
+```bash
+session-manager-plugin
 ```
 
 ### 6. Start the Docker Compose stack by running the following command:
