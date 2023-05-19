@@ -36,7 +36,6 @@ services:
       - mongodb
     networks:
       - plan2go
-    platform: linux/amd64
 
   TravelNoteServer:
     image: plan2go/travel_note_server:latest
@@ -50,7 +49,7 @@ services:
       - PostServerLocation=http://PostServer:8083
     networks:
       - plan2go
-    platform: linux/amd64
+  
 
   PostServer:
     image: plan2go/post_server:latest
