@@ -1,7 +1,7 @@
 version: '3'
 services:
   mongodb:
-    image: mongo
+    image: mongo # change it to "arm64v8/mongo" for mac M1 chip
     ports:
       - "27017:27017"
     environment:
@@ -49,6 +49,7 @@ services:
       - PostServerLocation=http://PostServer:8083
     networks:
       - plan2go
+  
 
   PostServer:
     image: plan2go/post_server:latest
